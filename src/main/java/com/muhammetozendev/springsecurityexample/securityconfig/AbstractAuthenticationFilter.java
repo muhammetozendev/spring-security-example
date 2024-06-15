@@ -31,6 +31,12 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
   @Override
   protected final void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    // Do not attempt to authenticate if the filter does not match the route
+    if (!requestMatcher.matches(request)) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     // Do not attempt to authenticate if authentication is not present
     Authentication authentication = getAuthenticationConverter().convert(request);
     if (authentication == null) {
